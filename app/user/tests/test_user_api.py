@@ -119,7 +119,7 @@ class PrivetUserApiTests(TestCase):
         self.user = create_user(
             name='khayalfarajov',
             email='khayalfarajov@gmail.com',
-            pasword='testing321'
+            password='testing321'
         )
         self.client = APIClient()
         self.client.force_authenticate(user=self.user)
