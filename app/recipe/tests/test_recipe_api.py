@@ -5,9 +5,13 @@ from django.urls import reverse
 from decimal import Decimal
 from core.models import Recipe
 from django.contrib.auth import get_user_model
-from recipe.serializers import RecipeSerializer
+from recipe.serializers import RecipeSerializer, RecipeDetailSerializer
 
 RECIPE_URL = reverse('recipe:recipe-list')
+
+
+def detail_url(recipe_id):
+    return reverse('recipe:recipe-detail', args=[recipe_id])
 
 
 def create_recipe(user, **params):
@@ -69,4 +73,12 @@ class PrivateTestAPI(TestCase):
         serializer = RecipeSerializer(recipes, many=True)
         res = self.client.get(RECIPE_URL)
         self.assertEqual(res.status_code, status.HTTP_200_OK)
+        self.assertEqual(res.data, serializer.data)
+
+    def test_get_recipe_detail(self):
+        """Test for  getting the recipe detail"""
+        recipe = create_recipe(user=self.user)
+        serializer = RecipeDetailSerializer(recipe)
+        url = detail_url(recipe.id)
+        res = self.client.get(url)
         self.assertEqual(res.data, serializer.data)
