@@ -9,6 +9,7 @@ from recipe.serializers import RecipeSerializer
 
 RECIPE_URL = reverse('recipe:recipe-list')
 
+
 def create_recipe(user, **params):
     defaults = {
         "title": "Sample recipe title",
@@ -21,18 +22,20 @@ def create_recipe(user, **params):
     recipe = Recipe.objects.create(user=user, **params)
     return recipe
 
+
 def create_user(**params):
     """Create and return a new user."""
     return get_user_model().objects.create_user(**params)
+
 
 class PublicTestAPI(TestCase):
     """Tests which don't require authentication"""
     def setUp(self):
         self.client = APIClient()
+
     def test_auth_required(self):
         res = self.client.get(RECIPE_URL)
         self.assertEqual(res.status_code, status.HTTP_401_UNAUTHORIZED)
-
 
 
 class PrivateTestAPI(TestCase):
@@ -67,7 +70,3 @@ class PrivateTestAPI(TestCase):
         res = self.client.get(RECIPE_URL)
         self.assertEqual(res.status_code, status.HTTP_200_OK)
         self.assertEqual(res.data, serializer.data)
-
-
-
-
