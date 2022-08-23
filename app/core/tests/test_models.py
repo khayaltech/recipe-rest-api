@@ -59,3 +59,14 @@ class ModelTests(TestCase):
             description='Sample recipe description'
         )
         self.assertEqual(str(res), res.title)
+
+    def test_tag_model(self):
+        """Test for creating tag model"""
+        user = get_user_model().objects.create_user(
+            "test@example.com",
+            "testing321")
+        res = models.Tag.objects.create(
+            user=user,
+            name='newtag'
+        )
+        self.assertEqual(str(res), res.name)
