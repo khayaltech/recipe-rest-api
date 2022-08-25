@@ -1,11 +1,11 @@
 """
 Views for recipe APIs
 """
-from rest_framework import viewsets
-from core.models import Recipe
-from recipe.serializers import RecipeDetailSerializer, RecipeSerializer
+from core.models import Recipe, Tag
+from recipe.serializers import RecipeDetailSerializer, RecipeSerializer, TagSerializer
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.permissions import IsAuthenticated
+from rest_framework import mixins, viewsets
 
 
 class RecipeViewSet(viewsets.ModelViewSet):
@@ -28,3 +28,15 @@ class RecipeViewSet(viewsets.ModelViewSet):
 
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
+
+
+class TagViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
+    "Manage tags in the database"
+    queryset = Tag.objects.all()
+    serializer_class = TagSerializer
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        """Filtering queryset to authenticted user"""
+        return self.queryset.filter(user=self.request.user).order_by('-name')
