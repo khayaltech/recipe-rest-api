@@ -7,6 +7,7 @@ from core.models import Recipe
 from django.contrib.auth import get_user_model
 from recipe.serializers import RecipeSerializer, RecipeDetailSerializer
 
+
 RECIPE_URL = reverse('recipe:recipe-list')
 
 
