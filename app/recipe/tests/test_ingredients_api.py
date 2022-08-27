@@ -9,6 +9,10 @@ from recipe.serializers import IngredientSerializer
 INGREDIENTS_URL = reverse("recipe:ingredient-list")
 
 
+def detail_url(ingredient_id):
+    return reverse("recipe:ingredient-detail", args=[ingredient_id])
+
+
 def create_user(**params):
     return get_user_model().objects.create_user(**params)
 
@@ -32,7 +36,7 @@ class PrivateTestAPI(TestCase):
         self.client.force_authenticate(self.user)
 
     def test_retrieving_ingredients(self):
-        """Test retrieving list of tags"""
+        """Test retrieving list of ingredients"""
         Ingredient.objects.create(user=self.user, name="ingredient1")
         Ingredient.objects.create(user=self.user, name="ingredient2")
 
@@ -44,7 +48,7 @@ class PrivateTestAPI(TestCase):
         self.assertEqual(res.data, serializer.data)
 
     def test_ingredients_limited_to_user(self):
-        """Test retrieving list of tags for authenticated user"""
+        """Test retrieving list of ingredients for authenticated user"""
         user2 = create_user(email='reandom@gmail.com', password='testing321')
         Ingredient.objects.create(user=user2, name="ingredient1")
         Ingredient.objects.create(user=self.user, name="ingredient2")
@@ -56,3 +60,24 @@ class PrivateTestAPI(TestCase):
         self.assertEqual(len(res.data), 1)
         self.assertEqual(res.data[0]["name"], ingredient.name)
         self.assertEqual(res.data[0]["id"], ingredient.id)
+
+    def test_updating_ingredients(self):
+        """Test for updating ingredients"""
+        ingredient = Ingredient.objects.create(user=self.user, name="pepper")
+        payload = {
+            "name": "salt"
+        }
+        url = detail_url(ingredient.id)
+        res = self.client.put(url, payload)
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+
+        ingredient.refresh_from_db()
+        self.assertEqual(ingredient.name, payload["name"])
+
+    def test_deleting_ingredients(self):
+        """Test for deleing ingredients"""
+        ingredient = Ingredient.objects.create(user=self.user, name="pepper")
+        url = detail_url(ingredient.id)
+        res = self.client.delete(url)
+        self.assertEqual(res.status_code, status.HTTP_204_NO_CONTENT)
+        self.assertFalse(Ingredient.objects.filter(id=ingredient.id).exists())
