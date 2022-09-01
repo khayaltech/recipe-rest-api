@@ -10,7 +10,7 @@ ENV APP_HOST=app
 ENV APP_PORT=9000
 
 USER root
-
+RUN rm -rf /etc/nginx/conf.d/default.conf
 RUN mkdir -p /vol/static && \
     chmod 755 /vol/static && \
     touch /etc/nginx/conf.d/default.conf && \
